@@ -11,5 +11,9 @@
   "dependencies": {
     "request": "^2.81.0",
     "request-promise": "^4.2.0"
+  },
+  "repository" :{
+    "type" : "git",
+    "url" : "https://github.com/InSilicoDB/gp-dev-sdk-js.git"
   }
 }
