@@ -1,6 +1,6 @@
 {
   "name": "gp-dev-sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "gp developer api SDK for JavaScript ",
   "main": "index.js",
   "scripts": {
@@ -12,8 +12,8 @@
     "request": "^2.81.0",
     "request-promise": "^4.2.0"
   },
-  "repository" :{
-    "type" : "git",
-    "url" : "https://github.com/InSilicoDB/gp-dev-sdk-js.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/InSilicoDB/gp-dev-sdk-js.git"
   }
 }
