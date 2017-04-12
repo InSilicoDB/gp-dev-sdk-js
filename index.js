@@ -9,8 +9,6 @@ module.exports = function (baseURL, clientName, clientSecret) {
     return {
 
         getToken: function (authorisationCode) {
-            console.log('client = ' + clientName);
-            console.log('password = ' + clientSecret);
             var requestOptions = {
                 uri: endpoints.token,
                 auth: {
@@ -68,7 +66,7 @@ module.exports = function (baseURL, clientName, clientSecret) {
             return request.post(requestOptions );
         },
 
-        markAnalysisAsFinished: function (accessToken, analysisId) {
+        markAnalysis: function (accessToken, analysisId, state) {
 
             var requestOptions = {
                 uri: endpoints.updateAnalysisState(analysisId),
@@ -80,13 +78,21 @@ module.exports = function (baseURL, clientName, clientSecret) {
                         type: 'analysis',
                         id: analysisId,
                         attributes: {
-                            status: 'ready'
+                            status: state
                         }
                     }
                 }
             };
-            request.patch( requestOptions );
+            return request.patch( requestOptions );
         },
+
+        markAnalysisAsFinished: function (accessToken, analysisId) {
+            return this.markAnalysis(accessToken, analysisId, "ready");
+        },
+
+        markAnalysisAsError: function (accessToken, analysisId) {
+            return this.markAnalysis(accessToken, analysisId, "error");
+        }
 
     };
 };
