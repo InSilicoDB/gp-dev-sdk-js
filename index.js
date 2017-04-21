@@ -8,25 +8,35 @@ module.exports = function (baseURL, clientName, clientSecret) {
 
     return {
 
-      getToken: function (authorisationCode) {
-          var requestOptions = {
-              uri: endpoints.token,
-              auth: {
-                  username: clientName,
-                  password: clientSecret
-              },
-              json: {
-                  data: {
-                      type: 'token',
-                      attributes: {
-                          grant_type: "authorization_code",
-                          code: authorisationCode,
-                          scope: "analysis"
-                      }
-                  }
-              }
+      getToken: function (authorisationCode, attributes) {
+        if (typeof attributes==="undefined" || !attributes) {
+          attributes = {
+            grant_type: "authorization_code",
+            code: authorisationCode,
+            scope: "analysis"
           };
-          return request.post( requestOptions );
+        }
+        var requestOptions = {
+          uri: endpoints.token,
+          auth: {
+            username: clientName,
+            password: clientSecret
+          },
+          json: {
+            data: {
+              type: 'token',
+              attributes: attributes
+            }
+          }
+        };
+        return request.post( requestOptions );
+      },
+
+      getAdminToken: function(authorisationCode) {
+        return this.getToken(authorisationCode, {
+          grant_type: "client_credentials",
+          scope: "admin"
+        });
       },
 
       querySNPGenotypes: function (token, datasetId, snpNames, quality=0.80) {
