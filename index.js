@@ -32,8 +32,8 @@ module.exports = function (baseURL, clientName, clientSecret) {
         return request.post( requestOptions );
       },
 
-      getAdminToken: function(authorisationCode) {
-        return this.getToken(authorisationCode, {
+      getAdminToken: function() {
+        return this.getToken(null, {
           grant_type: "client_credentials",
           scope: "admin"
         });
