@@ -122,7 +122,7 @@ module.exports = function (baseURL, clientName, clientSecret) {
         return request.post( requestOptions );
       },
 
-      createLocalArchiveDatasetImport: function(accessToken, datasetId, archiveLocation) {
+      createLocalArchiveDatasetImport: function(accessToken, datasetId, archiveLocation, addToLoadingQueue) {
         var requestOptions = {
           uri: endpoints.createDatasetImport(datasetId),
           auth: {
@@ -132,6 +132,7 @@ module.exports = function (baseURL, clientName, clientSecret) {
             data:{
               type: "dataset",
               attributes:{
+                addToLoadingQueue
                 datasourceType: "local-archive",
                 datasourceAttributes:{
                   location: archiveLocation
