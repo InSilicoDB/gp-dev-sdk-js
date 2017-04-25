@@ -6,6 +6,7 @@ module.exports = function (baseUrl) {
         createReportPage: analysisId => `${baseUrl}/analysis/${analysisId}/report-pages`,
         updateAnalysisState: analysisId => `${baseUrl}/analysis/${analysisId}`,
         createDataset: () => `${baseUrl}/datasets`,
-        createDatasetImport: (datasetId) => `${baseUrl}/datasets/${datasetId}/import`
+        createDatasetImport: (datasetId) => `${baseUrl}/datasets/${datasetId}/import`,
+        updateDatasetImport: (datasetImportId) => `${baseUrl}/datasetImports/${datasetImportId}`
     };
 };

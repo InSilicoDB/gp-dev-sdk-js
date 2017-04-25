@@ -132,7 +132,7 @@ module.exports = function (baseURL, clientName, clientSecret) {
             data:{
               type: "dataset",
               attributes:{
-                addToLoadingQueue
+                addToLoadingQueue,
                 datasourceType: "local-archive",
                 datasourceAttributes:{
                   location: archiveLocation
@@ -142,6 +142,25 @@ module.exports = function (baseURL, clientName, clientSecret) {
           }
         };
         return request.post( requestOptions );
+      },
+
+      markDatasetImportAsWaitForImputedData: function(accessToken, datasetImportId) {
+        var requestOptions = {
+          uri: endpoints.updateDatasetImport(datasetImportId),
+          auth: {
+            bearer: accessToken
+          },
+          json: {
+            data: {
+              type: 'datasetImport',
+              id: datasetImportId,
+              attributes: {
+                status: "wait-for-imputed-data"
+              }
+            }
+          }
+        };
+        return request.patch( requestOptions );
       }
 
     };
