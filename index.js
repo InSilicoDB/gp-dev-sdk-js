@@ -76,6 +76,25 @@ module.exports = function (baseURL, clientName, clientSecret) {
           return request.post(requestOptions );
       },
 
+      createAnalysis: function (accessToken, applicationId, datasetId) {
+        var requestOptions = {
+          uri: endpoints.createAnalysis(),
+          auth: {
+            bearer: accessToken
+          },
+          json: {
+            data: {
+              type: 'analysis',
+              attributes: {
+                applicationId,
+                datasetId
+              }
+            }
+          }
+        };
+        return request.post( requestOptions );
+      },
+
       markAnalysis: function (accessToken, analysisId, state) {
 
           var requestOptions = {
