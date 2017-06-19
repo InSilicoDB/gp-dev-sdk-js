@@ -1,6 +1,8 @@
 
 const DeveloperAPIEndpoints = require('./endpoints');
-const request = require('request-promise');
+const request = require('superagent');
+const Promise = require("bluebird");
+const fs = Promise.promisifyAll(require("fs"));
 
 module.exports = function (baseURL, clientName, clientSecret) {
 
@@ -95,7 +97,7 @@ module.exports = function (baseURL, clientName, clientSecret) {
         return request.post( requestOptions );
       },
 
-      markAnalysis: function (accessToken, analysisId, state) {
+      markAnalysis: function (accessToken, analysisId, state, notes) {
 
           var requestOptions = {
               uri: endpoints.updateAnalysisState(analysisId),
@@ -112,6 +114,9 @@ module.exports = function (baseURL, clientName, clientSecret) {
                   }
               }
           };
+          if (notes) {
+            requestOptions.json.data.attributes.notes = notes;
+          }
           return request.patch( requestOptions );
       },
 
@@ -119,8 +124,8 @@ module.exports = function (baseURL, clientName, clientSecret) {
         return this.markAnalysis(accessToken, analysisId, "ready");
       },
 
-      markAnalysisAsError: function (accessToken, analysisId) {
-        return this.markAnalysis(accessToken, analysisId, "error");
+      markAnalysisAsError: function (accessToken, analysisId, notes) {
+        return this.markAnalysis(accessToken, analysisId, "error", notes);
       },
 
       createDataset: function(accessToken, owner) {
@@ -180,6 +185,28 @@ module.exports = function (baseURL, clientName, clientSecret) {
           }
         };
         return request.patch( requestOptions );
+      },
+
+      analysisWrapper(authorisationCode, analysisId, contentFile, reportTitle, success) {
+        var self = this;
+        var contextObj = {};
+
+          if (success) {
+            return fs.accessAsync(contentFile).bind(contextObj)
+              .then( err          => err ? throw err : fs.readFileAsync(contentFile, "utf8") )
+              .then( data         => this.data = data )
+              .then( data         => this.getToken(authorisationCode) )
+              .then( bodyDevToken => this.token = bodyDevToken.data.attributes.accessToken )
+              .then( token        => self.addReportPage(this.token, analysisId, reportTitle, this.data ) )
+              .then( body         => self.markAnalysisAsFinished(this.token, analysisId) );
+          } else {
+            return fs.readFileAsync(contentFile, "utf8", (err, data) => err ? "" : data)
+              .bind( contextObj )
+              .then( data         => this.data = data )
+              .then( data         => this.getToken(authorisationCode) )
+              .then( bodyDevToken => this.token = bodyDevToken.data.attributes.accessToken )
+              .then( body         => self.markAnalysisAsError(this.token, analysisId, this.data) );
+          }
       }
 
     };
