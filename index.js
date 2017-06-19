@@ -192,15 +192,16 @@ module.exports = function (baseURL, clientName, clientSecret) {
         var contextObj = {};
 
           if (success) {
-            return fs.accessAsync(contentFile).bind(contextObj)
-              .then( err          => err ? throw err : fs.readFileAsync(contentFile, "utf8") )
+            return fs.readFileAsync(contentFile, "utf8")
+              .bind(contextObj)
               .then( data         => this.data = data )
               .then( data         => this.getToken(authorisationCode) )
               .then( bodyDevToken => this.token = bodyDevToken.data.attributes.accessToken )
               .then( token        => self.addReportPage(this.token, analysisId, reportTitle, this.data ) )
               .then( body         => self.markAnalysisAsFinished(this.token, analysisId) );
           } else {
-            return fs.readFileAsync(contentFile, "utf8", (err, data) => err ? "" : data)
+            return fs.readFileAsync(contentFile, "utf8")
+              .catch( err         => "" )
               .bind( contextObj )
               .then( data         => this.data = data )
               .then( data         => this.getToken(authorisationCode) )
