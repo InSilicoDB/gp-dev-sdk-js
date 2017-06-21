@@ -1,6 +1,6 @@
 
 const DeveloperAPIEndpoints = require('./endpoints');
-const request = require('superagent');
+const request = require('request-promise');
 const Promise = require("bluebird");
 const fs = Promise.promisifyAll(require("fs"));
 
@@ -194,19 +194,39 @@ module.exports = function (baseURL, clientName, clientSecret) {
           if (success) {
             return fs.readFileAsync(contentFile, "utf8")
               .bind(contextObj)
-              .then( data         => this.data = data )
+              .then( data         =>  {
+                this.data = data;
+                return data;
+              })
               .then( data         => this.getToken(authorisationCode) )
-              .then( bodyDevToken => this.token = bodyDevToken.data.attributes.accessToken )
-              .then( token        => self.addReportPage(this.token, analysisId, reportTitle, this.data ) )
-              .then( body         => self.markAnalysisAsFinished(this.token, analysisId) );
+              .then( bodyDevToken => {
+                this.token = bodyDevToken.data.attributes.accessToken;
+                return this.token;
+              })
+              .then( token        => {
+                return self.addReportPage(this.token, analysisId, reportTitle, this.data )
+              })
+              .then( body         => self.markAnalysisAsFinished(this.token, analysisId) )
+              .catch(function(err){
+                throw err;
+              });
           } else {
             return fs.readFileAsync(contentFile, "utf8")
               .catch( err         => "" )
               .bind( contextObj )
-              .then( data         => this.data = data )
+              .then( data         =>  {
+                this.data = data;
+                return data;
+              })
               .then( data         => this.getToken(authorisationCode) )
-              .then( bodyDevToken => this.token = bodyDevToken.data.attributes.accessToken )
-              .then( body         => self.markAnalysisAsError(this.token, analysisId, this.data) );
+              .then( bodyDevToken => {
+                this.token = bodyDevToken.data.attributes.accessToken;
+                return this.token;
+              })
+              .then( token         => self.markAnalysisAsError(token, analysisId, this.data) )
+              .catch(function(err){
+                throw err;
+              });
           }
       }
 
