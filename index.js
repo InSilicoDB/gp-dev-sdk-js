@@ -115,6 +115,7 @@ module.exports = function (baseURL, clientName, clientSecret) {
                   bearer: accessToken
               },
               followRedirect: true,
+              simple: false,
               json: {
                   data: {
                       type: 'analysis',
