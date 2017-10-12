@@ -2,7 +2,7 @@
 const DeveloperAPIEndpoints = require('./endpoints');
 const request = require('request-promise');
 const Promise = require("bluebird");
-const fs = Promise.promisifyAll(require("fs"));
+const fs      = Promise.promisifyAll(require("fs"));
 
 module.exports = function (baseURL, clientName, clientSecret) {
 
@@ -42,7 +42,6 @@ module.exports = function (baseURL, clientName, clientSecret) {
       },
 
       querySNPGenotypes: function (token, datasetId, snpNames, quality=0.80) {
-          console.log('querySNPGenotypes()');
           var endpointLocation = endpoints.datasetSNPs(datasetId);
           var requestOptions = {
               uri: endpointLocation,
@@ -53,6 +52,17 @@ module.exports = function (baseURL, clientName, clientSecret) {
               qs: {
                   names: snpNames.join(' '),
                   quality: quality
+              }
+          };
+          return request.get( requestOptions );
+      },
+
+      getEthnicity: function (token, datasetId) {
+          var requestOptions = {
+              uri: endpoints.datasetEthnicity(datasetId),
+              json: true,
+              auth: {
+                  bearer: token
               }
           };
           return request.get( requestOptions );

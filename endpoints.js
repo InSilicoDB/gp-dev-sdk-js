@@ -8,6 +8,7 @@ module.exports = function (baseUrl) {
         createAnalysis: () => `${baseUrl}/analysis`,
         createDataset: () => `${baseUrl}/datasets`,
         createDatasetImport: (datasetId) => `${baseUrl}/datasets/${datasetId}/import`,
-        updateDatasetImport: (datasetImportId) => `${baseUrl}/datasetImports/${datasetImportId}`
+        updateDatasetImport: (datasetImportId) => `${baseUrl}/datasetImports/${datasetImportId}`,
+        datasetEthnicity: (datasetId) => `${baseUrl}/datasets/${datasetId}/ethnicity`
     };
 };
