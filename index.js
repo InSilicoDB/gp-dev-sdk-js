@@ -41,20 +41,53 @@ module.exports = function (baseURL, clientName, clientSecret) {
         });
       },
 
+      /**
+       * This method will split the snpNames in a length that is allow for an url.
+       * Because the method is an GET we need to have a url less than 2000 chars
+      */
+      splitIntoQueryable: function(snpNames) {
+        const self             = this;
+        const queryLengthLimit = 1900;
+        var snpQuery           = snpNames.join(' ');
+        var snpsToQuery        = [];
+        while (snpQuery.length>queryLengthLimit) {
+          var removed = snpNames.splice(-1, (Math.floor(snpNames.length/10) || 1) );
+          snpsToQuery = snpsToQuery.concat(removed);
+          snpQuery    = snpNames.join(' ');
+        }
+        if (snpsToQuery.length>0) {
+          var splitted = self.splitIntoQueryable(snpsToQuery);
+          return splitted.reduce( (a,b) => {
+            a.push(b);
+            return a;
+          } ,[snpNames]);
+        } else {
+          return [snpNames];
+        }
+      },
+
       querySNPGenotypes: function (token, datasetId, snpNames, quality=0.80) {
           var endpointLocation = endpoints.datasetSNPs(datasetId);
-          var requestOptions = {
-              uri: endpointLocation,
-              json: true,
-              auth: {
-                  bearer: token
-              },
-              qs: {
-                  names: snpNames.join(' '),
-                  quality: quality
-              }
-          };
-          return request.get( requestOptions );
+          var queries          = this.splitIntoQueryable(snpNames);
+          var promiseChain     = Promise.resolve();
+          var response         = { data: [] };
+          queries.forEach( q => {
+            let requestOptions = {
+                uri: endpointLocation,
+                json: true,
+                auth: {
+                    bearer: token
+                },
+                qs: {
+                    names: q.join(' '),
+                    quality: quality
+                }
+            };
+            promiseChain.then( ()   => request.get( requestOptions ) )
+                        .then( body => response.data = response.data.concat(body.data) );
+          });
+
+          return promiseChain.then( () => response );
       },
 
       getEthnicity: function (token, datasetId) {
