@@ -1,6 +1,6 @@
 {
   "name": "gp-dev-sdk",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "gp developer api SDK for JavaScript ",
   "main": "index.js",
   "scripts": {
