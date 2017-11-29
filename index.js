@@ -84,8 +84,8 @@ module.exports = function (baseURL, clientName, clientSecret) {
                     quality: quality
                 }
             };
-            promiseChain.then( ()   => request.get( requestOptions ) )
-                        .then( body => response.data = response.data.concat(body.data) );
+            promiseChain = promiseChain.then( ()   => request.get( requestOptions ) )
+                                       .then( body => response.data = response.data.concat(body.data) );
           });
 
           return promiseChain.then( () => response );
