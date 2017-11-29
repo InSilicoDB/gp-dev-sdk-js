@@ -51,9 +51,10 @@ module.exports = function (baseURL, clientName, clientSecret) {
         var snpQuery           = snpNames.join(' ');
         var snpsToQuery        = [];
         while (snpQuery.length>queryLengthLimit) {
-          var removed = snpNames.splice(-1, (Math.floor(snpNames.length/10) || 1) );
-          snpsToQuery = snpsToQuery.concat(removed);
-          snpQuery    = snpNames.join(' ');
+          let toRemoveLength = (Math.floor(snpNames.length/10) || 1);
+          let removed        = snpNames.splice(-toRemoveLength, toRemoveLength);
+          snpsToQuery        = snpsToQuery.concat(removed);
+          snpQuery           = snpNames.join(' ');
         }
         if (snpsToQuery.length>0) {
           var splitted = self.splitIntoQueryable(snpsToQuery);
