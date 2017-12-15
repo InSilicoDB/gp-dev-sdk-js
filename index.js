@@ -91,12 +91,22 @@ module.exports = function (baseURL, clientName, clientSecret) {
           return promiseChain.then( () => response );
       },
 
-      getEthnicity: function (token, datasetId) {
+      getAnalysis(accessToken, analysisId) {
+        var requestOptions = {
+            uri: endpoints.getAnalysis(analysisId),
+            auth: {
+              bearer: accessToken
+            }
+        };
+        return request.get( requestOptions );
+      },
+
+      getEthnicity: function (accessToken, datasetId) {
           var requestOptions = {
               uri: endpoints.datasetEthnicity(datasetId),
               json: true,
               auth: {
-                  bearer: token
+                  bearer: accessToken
               }
           };
           return request.get( requestOptions );
