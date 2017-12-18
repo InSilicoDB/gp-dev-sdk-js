@@ -96,7 +96,8 @@ module.exports = function (baseURL, clientName, clientSecret) {
             uri: endpoints.getAnalysis(analysisId),
             auth: {
               bearer: accessToken
-            }
+            },
+            json: true
         };
         return request.get( requestOptions );
       },
