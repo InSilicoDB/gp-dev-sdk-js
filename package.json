@@ -13,6 +13,7 @@
     "request": "^2.81.0",
     "request-promise": "^4.2.0",
     "superagent": "^3.5.2",
+    "tmp": "^0.0.33",
     "unzip": "^0.1.11",
     "wget-improved": "^3.0.1"
   },

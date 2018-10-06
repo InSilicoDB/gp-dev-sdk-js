@@ -2,14 +2,16 @@ const request = require("request-promise")
 const wget    = require("wget-improved")
 const path    = require("path")
 const unzip   = require("unzip")
+const tmp     = require("tmp")
 const Promise = require("bluebird")
-const os      = require("os")
 const readline = require("readline")
 const fs      = Promise.promisifyAll(require("fs"))
 const DeveloperAPIEndpoints = require("./endpoints")
 
 module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
   const endpoints = new DeveloperAPIEndpoints(baseURL)
+
+  let cleanupCallbacks = []
 
   const api = {
     getToken(authorisationCode, attributes) {
@@ -155,10 +157,10 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
     async querySNPGenotypesFromFile(token, datasetId, snpNames) {
       const { data: fileUrls } = await api.getDatasetFilesUrl(datasetId, token)
       const { id: fileUrl } = fileUrls.find(fu => fu.id.split("/").pop().replace(/(\?|#).*$/, "").endsWith(".gen.zip"))
-      const filePath     = await api.downloadFile(datasetId, fileUrl)
-      const fileFolder   = await api.unzip(datasetId, filePath)
-      const genotypesMap = await api.getGenotypesFromFiles(new Set(snpNames), fileFolder)
-      const genoytpesObj = [...genotypesMap.entries()].reduce((obj, [key, value]) => {
+      const filePath        = await api.downloadFile(datasetId, fileUrl)
+      const fileFolder      = await api.unzip(datasetId, filePath)
+      const genotypesMap    = await api.getGenotypesFromFiles(new Set(snpNames), fileFolder)
+      const genoytpesObj    = [...genotypesMap.entries()].reduce((obj, [key, value]) => {
         obj[key] = value // eslint-disable-line no-param-reassign
         return obj
       }, {})
@@ -176,10 +178,26 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
       return request.get(requestOptions)
     },
 
-    downloadFile(datasetId, datasetFileUrl) {
+    async getTempDir() {
+      const [tmpdir, cleanupCallback] = await new Promise((resolve, reject) => tmp.dir({ unsafeCleanup: true }, (err, folderPath, cleanupCb) => {
+        if (err) reject(err)
+        resolve([folderPath, cleanupCb])
+      }))
+      cleanupCallbacks.push(cleanupCallback)
+      return tmpdir
+    },
+
+    cleanupFiles() {
+      const localCleanupCallbacks = cleanupCallbacks
+      cleanupCallbacks = []
+      localCleanupCallbacks.forEach(cb => cb())
+    },
+
+    async downloadFile(datasetId, datasetFileUrl) {
       const src      = datasetFileUrl
       const filename = src.split("/").pop().replace(/(\?|#).*$/, "")
-      const output   = `${os.tmpdir()}/${datasetId}_${Date.now()}_${path.extname(filename)}`
+      const tmpdir   = await api.getTempDir()
+      const output   = `${tmpdir}/${datasetId}_${Date.now()}_${path.extname(filename)}`
       return new Promise((resolve, reject) => {
         const download = wget.download(src, output)
         download.on("error", err => reject(err))
@@ -187,8 +205,9 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
       })
     },
 
-    unzip(datasetId, file) {
-      const output = `${os.tmpdir()}/${datasetId}_${Date.now()}`
+    async unzip(datasetId, file) {
+      const tmpdir   = await api.getTempDir()
+      const output = `${tmpdir}/${datasetId}_${Date.now()}`
       return new Promise(resolve => {
         fs.createReadStream(file).pipe(
           unzip.Extract({ path: output }).on("close", () => resolve(output))
