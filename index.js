@@ -160,11 +160,7 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
       const filePath        = await api.downloadFile(datasetId, fileUrl)
       const fileFolder      = await api.unzip(datasetId, filePath)
       const genotypesMap    = await api.getGenotypesFromFiles(new Set(snpNames), fileFolder)
-      const genoytpesObj    = [...genotypesMap.entries()].reduce((obj, [key, value]) => {
-        obj[key] = value // eslint-disable-line no-param-reassign
-        return obj
-      }, {})
-      return genoytpesObj
+      return genotypesMap
     },
 
     getDatasetFilesUrl(datasetId, accessToken) {
