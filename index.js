@@ -202,12 +202,13 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
     },
 
     async unzip(datasetId, file) {
-      const tmpdir   = await api.getTempDir()
+      const tmpdir = await api.getTempDir()
       const output = `${tmpdir}/${datasetId}_${Date.now()}`
-      return new Promise(resolve => {
-        fs.createReadStream(file).pipe(
-          unzip.Extract({ path: output }).on("close", () => resolve(output))
-        )
+      return new Promise((resolve, reject) => {
+        const unzipExtractor = unzip.Extract({ path: output })
+        unzipExtractor.on("error", reject)
+        unzipExtractor.on("close", () => resolve(output))
+        fs.createReadStream(file).pipe(unzipExtractor)
       })
     },
 
