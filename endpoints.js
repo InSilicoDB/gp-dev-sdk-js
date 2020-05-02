@@ -1,5 +1,4 @@
-/* eslint-disable key-spacing */
-module.exports = function DeveloperAPIEndpoints(baseUrl) {
+module.exports = function DeveloperAPIEndpoints (baseUrl) {
   return {
     token:               `${baseUrl}/token`,
     datasetSNPs:         datasetId       => `${baseUrl}/datasets/${datasetId}/SNP`,
@@ -14,4 +13,3 @@ module.exports = function DeveloperAPIEndpoints(baseUrl) {
     datasetFileUrls:     datasetId       => `${baseUrl}/datasets/${datasetId}/files`
   }
 }
-/* eslint-enable key-spacing */

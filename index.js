@@ -1,25 +1,25 @@
-const request = require("request-promise")
-const wget    = require("wget-improved")
-const path    = require("path")
-const unzip   = require("unzip")
-const tmp     = require("tmp")
-const Promise = require("bluebird")
-const readline = require("readline")
-const fs      = Promise.promisifyAll(require("fs"))
-const DeveloperAPIEndpoints = require("./endpoints")
+const fs = require('fs')
+const path = require('path')
+const readline = require('readline')
 
-module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
+const wget = require('wget-improved')
+const unzip = require('unzip')
+const tmp = require('tmp')
+const request = require('request-promise')
+const DeveloperAPIEndpoints = require('./endpoints')
+
+module.exports = function DeveloperAPI (baseURL, clientName, clientSecret) {
   const endpoints = new DeveloperAPIEndpoints(baseURL)
 
   let cleanupCallbacks = []
 
   const api = {
-    getToken(authorisationCode, attributes) {
-      if (typeof attributes === "undefined" || !attributes) {
+    getToken (authorisationCode, attributes) {
+      if (typeof attributes === 'undefined' || !attributes) {
         attributes = { // eslint-disable-line no-param-reassign
-          grant_type: "authorization_code",
+          grant_type: 'authorization_code',
           code: authorisationCode,
-          scope: "analysis"
+          scope: 'analysis'
         }
       }
       const requestOptions = {
@@ -30,7 +30,7 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
         },
         json: {
           data: {
-            type: "token",
+            type: 'token',
             attributes
           }
         }
@@ -38,10 +38,10 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
       return request.post(requestOptions)
     },
 
-    getAdminToken() {
+    getAdminToken () {
       return this.getToken(null, {
-        grant_type: "client_credentials",
-        scope: "admin"
+        grant_type: 'client_credentials',
+        scope: 'admin'
       })
     },
 
@@ -49,16 +49,16 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
      * This method will split the snpNames in a length that is allow for an url.
      * Because the method is an GET we need to have a url less than 2000 chars
     */
-    splitIntoQueryable(snpNames) {
-      const self             = this
+    splitIntoQueryable (snpNames) {
+      const self = this
       const queryLengthLimit = 1900
-      let snpQuery           = snpNames.join(" ")
-      let snpsToQuery        = []
+      let snpQuery = snpNames.join(' ')
+      let snpsToQuery = []
       while (snpQuery.length > queryLengthLimit) {
         const toRemoveLength = (Math.floor(snpNames.length / 10) || 1)
-        const removed        = snpNames.splice(-toRemoveLength, toRemoveLength)
-        snpsToQuery        = snpsToQuery.concat(removed)
-        snpQuery           = snpNames.join(" ")
+        const removed = snpNames.splice(-toRemoveLength, toRemoveLength)
+        snpsToQuery = snpsToQuery.concat(removed)
+        snpQuery = snpNames.join(' ')
       }
       if (snpsToQuery.length > 0) {
         const splitted = self.splitIntoQueryable(snpsToQuery)
@@ -70,11 +70,11 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
       return [snpNames]
     },
 
-    querySNPGenotypes(token, datasetId, snpNames, quality = 0.80) {
+    querySNPGenotypes (token, datasetId, snpNames, quality = 0.80) {
       const endpointLocation = endpoints.datasetSNPs(datasetId)
-      const queries          = this.splitIntoQueryable(snpNames)
-      let promiseChain       = Promise.resolve()
-      const response         = { data: [] }
+      const queries = this.splitIntoQueryable(snpNames)
+      let promiseChain = Promise.resolve()
+      const response = { data: [] }
       queries.forEach(q => {
         const requestOptions = {
           uri: endpointLocation,
@@ -83,7 +83,7 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
             bearer: token
           },
           qs: {
-            names: q.join(" "),
+            names: q.join(' '),
             quality
           }
         }
@@ -94,7 +94,7 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
       return promiseChain.then(() => response)
     },
 
-    getAnalysis(accessToken, analysisId) {
+    getAnalysis (accessToken, analysisId) {
       const requestOptions = {
         uri: endpoints.getAnalysis(analysisId),
         auth: {
@@ -105,7 +105,7 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
       return request.get(requestOptions)
     },
 
-    getEthnicity(accessToken, datasetId) {
+    getEthnicity (accessToken, datasetId) {
       const requestOptions = {
         uri: endpoints.datasetEthnicity(datasetId),
         json: true,
@@ -116,7 +116,7 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
       return request.get(requestOptions)
     },
 
-    addReportPage(accessToken, analysisId, title, content) {
+    addReportPage (accessToken, analysisId, title, content) {
       const requestOptions = {
         uri: endpoints.createReportPage(analysisId),
         auth: {
@@ -124,7 +124,7 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
         },
         json: {
           data: {
-            type: "page",
+            type: 'page',
             attributes: {
               title,
               content
@@ -135,7 +135,7 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
       return request.post(requestOptions)
     },
 
-    createAnalysis(accessToken, applicationId, datasetId) {
+    createAnalysis (accessToken, applicationId, datasetId) {
       const requestOptions = {
         uri: endpoints.createAnalysis(),
         auth: {
@@ -143,7 +143,7 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
         },
         json: {
           data: {
-            type: "analysis",
+            type: 'analysis',
             attributes: {
               applicationId,
               datasetId
@@ -154,16 +154,16 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
       return request.post(requestOptions)
     },
 
-    async querySNPGenotypesFromFile(token, datasetId, snpNames) {
+    async querySNPGenotypesFromFile (token, datasetId, snpNames) {
       const { data: fileUrls } = await api.getDatasetFilesUrl(datasetId, token)
-      const { id: fileUrl } = fileUrls.find(fu => fu.id.split("/").pop().replace(/(\?|#).*$/, "").endsWith(".gen.zip"))
-      const filePath        = await api.downloadFile(datasetId, fileUrl)
-      const fileFolder      = await api.unzip(datasetId, filePath)
-      const genotypesMap    = await api.getGenotypesFromFiles(new Set(snpNames), fileFolder)
+      const { id: fileUrl } = fileUrls.find(fu => fu.id.split('/').pop().replace(/(\?|#).*$/, '').endsWith('.gen.zip'))
+      const filePath = await api.downloadFile(datasetId, fileUrl)
+      const fileFolder = await api.unzip(datasetId, filePath)
+      const genotypesMap = await api.getGenotypesFromFiles(new Set(snpNames), fileFolder)
       return genotypesMap
     },
 
-    getDatasetFilesUrl(datasetId, accessToken) {
+    getDatasetFilesUrl (datasetId, accessToken) {
       const requestOptions = {
         uri: endpoints.datasetFileUrls(datasetId),
         json: true,
@@ -174,7 +174,7 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
       return request.get(requestOptions)
     },
 
-    async getTempDir() {
+    async getTempDir () {
       const [tmpdir, cleanupCallback] = await new Promise((resolve, reject) => tmp.dir({ unsafeCleanup: true }, (err, folderPath, cleanupCb) => {
         if (err) reject(err)
         resolve([folderPath, cleanupCb])
@@ -183,36 +183,36 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
       return tmpdir
     },
 
-    cleanupFiles() {
+    cleanupFiles () {
       const localCleanupCallbacks = cleanupCallbacks
       cleanupCallbacks = []
       localCleanupCallbacks.forEach(cb => cb())
     },
 
-    async downloadFile(datasetId, datasetFileUrl) {
-      const src      = datasetFileUrl
-      const filename = src.split("/").pop().replace(/(\?|#).*$/, "")
-      const tmpdir   = await api.getTempDir()
-      const output   = `${tmpdir}/${datasetId}_${Date.now()}_${path.extname(filename)}`
+    async downloadFile (datasetId, datasetFileUrl) {
+      const src = datasetFileUrl
+      const filename = src.split('/').pop().replace(/(\?|#).*$/, '')
+      const tmpdir = await api.getTempDir()
+      const output = `${tmpdir}/${datasetId}_${Date.now()}_${path.extname(filename)}`
       return new Promise((resolve, reject) => {
         const download = wget.download(src, output)
-        download.on("error", err => reject(err))
-        download.on("end", () => resolve(output))
+        download.on('error', err => reject(err))
+        download.on('end', () => resolve(output))
       })
     },
 
-    async unzip(datasetId, file) {
+    async unzip (datasetId, file) {
       const tmpdir = await api.getTempDir()
       const output = `${tmpdir}/${datasetId}_${Date.now()}`
       return new Promise((resolve, reject) => {
         const unzipExtractor = unzip.Extract({ path: output })
-        unzipExtractor.on("error", reject)
-        unzipExtractor.on("close", () => resolve(output))
+        unzipExtractor.on('error', reject)
+        unzipExtractor.on('close', () => resolve(output))
         fs.createReadStream(file).pipe(unzipExtractor)
       })
     },
 
-    async getGenotypesFromFiles(snpSet, snpFilesfolder) {
+    async getGenotypesFromFiles (snpSet, snpFilesfolder) {
       const resultMap = new Map()
       const files = await new Promise((resolve, reject) => fs.readdir(snpFilesfolder, (err, f) => (err ? reject(err) : resolve(f))))
       const promises = files.map(async file => {
@@ -224,7 +224,7 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
             const lineReader = readline.createInterface({
               input: fs.createReadStream(fullPath)
             })
-            lineReader.on("line", line => {
+            lineReader.on('line', line => {
               if (resultMap.size === snpSet.size) {
                 lineReader.close()
               }
@@ -243,7 +243,7 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
                 resultMap.set(snp, genotype)
               }
             })
-            lineReader.on("close", resolve)
+            lineReader.on('close', resolve)
           })
         }
         return promise
@@ -252,7 +252,7 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
       return resultMap
     },
 
-    markAnalysis(accessToken, analysisId, state, notes) {
+    markAnalysis (accessToken, analysisId, state, notes) {
       const requestOptions = {
         uri: endpoints.updateAnalysisState(analysisId),
         auth: {
@@ -262,7 +262,7 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
         simple: false,
         json: {
           data: {
-            type: "analysis",
+            type: 'analysis',
             id: analysisId,
             attributes: {
               status: state
@@ -276,15 +276,15 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
       return request.patch(requestOptions)
     },
 
-    markAnalysisAsFinished(accessToken, analysisId) {
-      return this.markAnalysis(accessToken, analysisId, "ready")
+    markAnalysisAsFinished (accessToken, analysisId) {
+      return this.markAnalysis(accessToken, analysisId, 'ready')
     },
 
-    markAnalysisAsError(accessToken, analysisId, notes) {
-      return this.markAnalysis(accessToken, analysisId, "error", notes)
+    markAnalysisAsError (accessToken, analysisId, notes) {
+      return this.markAnalysis(accessToken, analysisId, 'error', notes)
     },
 
-    createDataset(accessToken, owner) {
+    createDataset (accessToken, owner) {
       const requestOptions = {
         uri: endpoints.createDataset(),
         auth: {
@@ -292,7 +292,7 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
         },
         json: {
           data: {
-            type: "dataset",
+            type: 'dataset',
             attributes: {
               owner
             }
@@ -302,7 +302,7 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
       return request.post(requestOptions)
     },
 
-    createLocalArchiveDatasetImport(accessToken, datasetId, archiveLocation, addToLoadingQueue) {
+    createLocalArchiveDatasetImport (accessToken, datasetId, archiveLocation, addToLoadingQueue) {
       const requestOptions = {
         uri: endpoints.createDatasetImport(datasetId),
         auth: {
@@ -310,10 +310,10 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
         },
         json: {
           data: {
-            type: "dataset",
+            type: 'dataset',
             attributes: {
               addToLoadingQueue,
-              datasourceType: "local-archive",
+              datasourceType: 'local-archive',
               datasourceAttributes: {
                 location: archiveLocation
               }
@@ -324,7 +324,7 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
       return request.post(requestOptions)
     },
 
-    markDatasetImportAsWaitForImputedData(accessToken, datasetImportId) {
+    markDatasetImportAsWaitForImputedData (accessToken, datasetImportId) {
       const requestOptions = {
         uri: endpoints.updateDatasetImport(datasetImportId),
         auth: {
@@ -332,10 +332,10 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
         },
         json: {
           data: {
-            type: "datasetImport",
+            type: 'datasetImport',
             id: datasetImportId,
             attributes: {
-              status: "wait-for-imputed-data"
+              status: 'wait-for-imputed-data'
             }
           }
         }
@@ -343,42 +343,16 @@ module.exports = function DeveloperAPI(baseURL, clientName, clientSecret) {
       return request.patch(requestOptions)
     },
 
-    analysisWrapper(authorisationCode, analysisId, contentFile, reportTitle, success) {
-      const self = this
-      const contextObj = {}
-
-      let promise = fs.readFileAsync(contentFile, "utf8")
-        .catch(err => {
-          if (!success) {
-            throw err
-          }
-        })
-        .bind(contextObj)
-        .then(data =>  {
-          this.data = data
-          return data
-        })
-        .then(() => this.getToken(authorisationCode))
-        .then(bodyDevToken => {
-          this.token = bodyDevToken.data.attributes.accessToken
-          return this.token
-        })
-
+    async analysisWrapper (authorisationCode, analysisId, contentFile, reportTitle, success) {
+      const data = await new Promise((resolve, reject) => fs.readFile(contentFile, 'utf8', (err, data) => err ? reject(err) : resolve(data)))
+      const bodyDevToken = await this.getToken(authorisationCode)
+      const token = bodyDevToken.data.attributes.accessToken
       if (success) {
-        promise = promise
-          .then(token => self.addReportPage(token, analysisId, reportTitle, this.data))
-          .then(() => self.markAnalysisAsFinished(this.token, analysisId))
-          .catch(err => {
-            throw err
-          })
+        await this.addReportPage(token, analysisId, reportTitle, data)
+        await this.markAnalysisAsFinished(this.token, analysisId)
       } else {
-        promise = promise
-          .then(token => self.markAnalysisAsError(token, analysisId, this.data))
-          .catch(err => {
-            throw err
-          })
+        await this.markAnalysisAsError(token, analysisId, data)
       }
-      return promise
     }
   }
   return api

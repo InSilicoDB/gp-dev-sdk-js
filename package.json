@@ -9,10 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bluebird": "^3.5.0",
-    "request": "^2.81.0",
-    "request-promise": "^4.2.0",
-    "superagent": "^3.5.2",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.5",
     "tmp": "^0.0.33",
     "unzip": "^0.1.11",
     "wget-improved": "^3.0.1"
@@ -22,8 +20,6 @@
     "url": "https://github.com/InSilicoDB/gp-dev-sdk-js.git"
   },
   "devDependencies": {
-    "eslint": "^5.6.1",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.14.0"
+    "standardjs": "^1.0.0-alpha"
   }
 }
