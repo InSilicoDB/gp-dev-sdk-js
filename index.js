@@ -3,7 +3,7 @@ const path = require('path')
 const readline = require('readline')
 
 const wget = require('wget-improved')
-const unzip = require('unzip')
+const unzip = require('unzipper')
 const tmp = require('tmp')
 const request = require('request-promise')
 const DeveloperAPIEndpoints = require('./endpoints')
