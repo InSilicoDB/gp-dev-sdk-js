@@ -4,6 +4,6 @@
 
 ```bash
 git commit -m '<msg>'
-npm publish <major | minor | patch> // will create a new tag version
+npm version <major | minor | patch> // will create a new tag version
 npm publish
 ```
