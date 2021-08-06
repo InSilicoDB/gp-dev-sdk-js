@@ -20,6 +20,6 @@
     "url": "https://github.com/InSilicoDB/gp-dev-sdk-js.git"
   },
   "devDependencies": {
-    "standardjs": "^1.0.0-alpha"
+    "standard": "^16.0.3"
   }
 }
