@@ -1184,12 +1184,7 @@ minimatch@^3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimist@1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.0.tgz#a35008b20f41383eec1fb914f4cd5df79a264284"
-  integrity sha1-o1AIsg9BOD7sH7kU9M1d95omQoQ=
-
-minimist@^1.2.0, minimist@^1.2.5:
+minimist@1.2.5, minimist@^1.2.0, minimist@^1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
   integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
@@ -1956,12 +1951,12 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-wget-improved@^3.0.1:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/wget-improved/-/wget-improved-3.2.0.tgz#c9ec2e916bda46fa26306c8282311e3c96802747"
-  integrity sha512-QaUzW5TfCaorSBvXl4jUiOUAEcg1P9Lr9zKktmxry8stEexuNEWqF7zLDxIxPoaOTHGCzMNhgA14/+vlQGtSVw==
+wget-improved@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/wget-improved/-/wget-improved-3.2.1.tgz#b71cbca9a9196f46f85c7c3ea7e61aa6e957d90a"
+  integrity sha512-bZmRufYav/OFRdS8LerCbzP3b/L8tjRwqap6NhqcvEAfZrBMFwqjtFzbVk2gutEWdG78WKJgIn9yveI+ENQSlA==
   dependencies:
-    minimist "1.2.0"
+    minimist "1.2.5"
     tunnel "0.0.6"
 
 which-boxed-primitive@^1.0.2:
