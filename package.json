@@ -9,17 +9,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "request": "^2.88.2",
-    "request-promise": "^4.2.5",
-    "tmp": "^0.0.33",
-    "unzipper": "^0.10.11",
-    "wget-improved": "^3.2.1"
+    "unzipper": "^0.10.11"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/InSilicoDB/gp-dev-sdk-js.git"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "devDependencies": {
-    "standard": "^16.0.3"
+    "standard": "^17.1.2"
   }
 }
