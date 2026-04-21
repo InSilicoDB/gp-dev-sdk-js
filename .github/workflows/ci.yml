@@ -52,5 +52,5 @@ jobs:
 
       - name: Publish to npm
         run: |
-          npm config delete //registry.npmjs.org/:_authToken
+          echo "registry=https://registry.npmjs.org/" > .npmrc
           npm publish --access public --provenance
