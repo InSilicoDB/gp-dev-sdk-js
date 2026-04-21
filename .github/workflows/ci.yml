@@ -42,9 +42,15 @@ jobs:
         with:
           node-version: 22
           cache: yarn
+          registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Set version from tag
+        run: npm version ${GITHUB_REF_NAME} --no-git-tag-version
+
       - name: Publish to npm
-        run: npm publish --access public --provenance
+        run: |
+          npm config delete //registry.npmjs.org/:_authToken
+          npm publish --access public --provenance
