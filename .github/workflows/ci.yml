@@ -27,31 +27,32 @@ jobs:
         run: yarn test
 
   npm-publish:
-    if: startsWith(github.ref, 'refs/tags/')
-    needs: test-and-lint
-    runs-on: ubuntu-latest
-    environment: npm-publish
-    permissions:
-      id-token: write
+      if: startsWith(github.ref, 'refs/tags/')
+      needs: test-and-lint
+      runs-on: ubuntu-latest
+      environment: npm-publish
+      permissions:
+        id-token: write
+        contents: read # Required to read the code for provenance
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4 # v4 is standard; v5 is fine if available
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: yarn
-          registry-url: https://registry.npmjs.org
+        - name: Set up Node.js
+          uses: actions/setup-node@v4
+          with:
+            node-version: 22
+            # Note: Do NOT set registry-url here for Trusted Publishing
+            # Setting registry-url tells npm to look for a NODE_AUTH_TOKEN
+            # which overrides the automatic OIDC login.
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        - name: Install dependencies
+          run: yarn install --frozen-lockfile
 
-      - name: Set version from tag
-        run: npm version ${GITHUB_REF_NAME} --no-git-tag-version
+        - name: Set version from tag
+          run: npm version ${GITHUB_REF_NAME} --no-git-tag-version
 
-      - name: Publish to npm
-        run: |
-          echo "registry=https://registry.npmjs.org/" > .npmrc
-          npm publish --access public --provenance --verbose
+        - name: Publish to npm
+          run: npm publish --access public --provenance
+          # No 'env: NODE_AUTH_TOKEN' needed here!
