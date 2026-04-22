@@ -32,7 +32,7 @@ jobs:
       runs-on: ubuntu-latest
       environment: npm-publish
       permissions:
-        id-token: write
+        id-token: write # Critical for OIDC
         contents: read # Required to read the code for provenance
 
       steps:
@@ -42,14 +42,7 @@ jobs:
         - name: Set up Node.js
           uses: actions/setup-node@v4
           with:
-            node-version: 22
-            # Note: Do NOT set registry-url here for Trusted Publishing
-            # Setting registry-url tells npm to look for a NODE_AUTH_TOKEN
-            # which overrides the automatic OIDC login.
-
-        - name: Ensure clean OIDC environment
-          run: |
-            rm -f .npmrc
+            node-version: 24
 
         - name: Install dependencies
           run: yarn install --frozen-lockfile
@@ -58,5 +51,5 @@ jobs:
           run: npm version ${GITHUB_REF_NAME} --no-git-tag-version
 
         - name: Publish to npm
-          run: npm publish --access public --provenance
+          run: npm publish --access public --provenance --verbose
           # No 'env: NODE_AUTH_TOKEN' needed here!
