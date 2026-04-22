@@ -50,7 +50,6 @@ jobs:
         - name: Ensure clean OIDC environment
           run: |
             rm -f .npmrc
-            npm install -g npm@latest
 
         - name: Install dependencies
           run: yarn install --frozen-lockfile
