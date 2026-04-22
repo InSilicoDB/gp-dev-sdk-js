@@ -30,6 +30,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     needs: test-and-lint
     runs-on: ubuntu-latest
+    environment: npm-publish
     permissions:
       id-token: write
 
