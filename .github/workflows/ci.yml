@@ -47,6 +47,11 @@ jobs:
             # Setting registry-url tells npm to look for a NODE_AUTH_TOKEN
             # which overrides the automatic OIDC login.
 
+        - name: Ensure clean OIDC environment
+          run: |
+            rm -f .npmrc
+            npm install -g npm@latest
+
         - name: Install dependencies
           run: yarn install --frozen-lockfile
 
