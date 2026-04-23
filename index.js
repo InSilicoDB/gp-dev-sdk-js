@@ -9,6 +9,11 @@ const zlib = require('zlib')
 const unzip = require('unzipper')
 const DeveloperAPIEndpoints = require('./endpoints')
 
+const PATCH = 'PATCH'
+const POST = 'POST'
+const GET = 'GET'
+const DELETE = 'DELETE'
+
 module.exports = function DeveloperAPI (baseURL, clientName, clientSecret) {
   const endpoints = new DeveloperAPIEndpoints(baseURL)
 
@@ -75,7 +80,7 @@ module.exports = function DeveloperAPI (baseURL, clientName, clientSecret) {
           }
         }
       }
-      return this.request('post', requestOptions.uri, requestOptions)
+      return this.request(POST, requestOptions.uri, requestOptions)
     },
 
     getAdminToken () {
@@ -128,7 +133,7 @@ module.exports = function DeveloperAPI (baseURL, clientName, clientSecret) {
           }
         }
         promiseChain = promiseChain
-          .then(() => this.request('get', requestOptions.uri, requestOptions))
+          .then(() => this.request(GET, requestOptions.uri, requestOptions))
           .then(body => { response.data = response.data.concat(body.data) })
       })
       return promiseChain.then(() => response)
@@ -142,7 +147,7 @@ module.exports = function DeveloperAPI (baseURL, clientName, clientSecret) {
         },
         json: true
       }
-      return this.request('get', requestOptions.uri, requestOptions)
+      return this.request(GET, requestOptions.uri, requestOptions)
     },
 
     getEthnicity (accessToken, datasetId) {
@@ -191,7 +196,7 @@ module.exports = function DeveloperAPI (baseURL, clientName, clientSecret) {
           }
         }
       }
-      return this.request('post', requestOptions.uri, requestOptions)
+      return this.request(POST, requestOptions.uri, requestOptions)
     },
 
     async querySNPGenotypesFromFile (token, datasetId, snpNames) {
@@ -222,7 +227,7 @@ module.exports = function DeveloperAPI (baseURL, clientName, clientSecret) {
           bearer: accessToken
         }
       }
-      return this.request('get', requestOptions.uri, requestOptions)
+      return this.request(GET, requestOptions.uri, requestOptions)
     },
 
     async getTempDir () {
@@ -388,7 +393,7 @@ module.exports = function DeveloperAPI (baseURL, clientName, clientSecret) {
       if (notes) {
         requestOptions.json.data.attributes.notes = notes
       }
-      return this.request('patch', requestOptions.uri, requestOptions)
+      return this.request(PATCH, requestOptions.uri, requestOptions)
     },
 
     markAnalysisAsFinished (accessToken, analysisId) {
@@ -414,7 +419,7 @@ module.exports = function DeveloperAPI (baseURL, clientName, clientSecret) {
           }
         }
       }
-      return this.request('post', requestOptions.uri, requestOptions)
+      return this.request(POST, requestOptions.uri, requestOptions)
     },
 
     createLocalArchiveDatasetImport (accessToken, datasetId, archiveLocation, addToLoadingQueue) {
@@ -436,7 +441,7 @@ module.exports = function DeveloperAPI (baseURL, clientName, clientSecret) {
           }
         }
       }
-      return this.request('post', requestOptions.uri, requestOptions)
+      return this.request(POST, requestOptions.uri, requestOptions)
     },
 
     markDatasetImportAsWaitForImputedData (accessToken, datasetImportId) {
@@ -455,7 +460,7 @@ module.exports = function DeveloperAPI (baseURL, clientName, clientSecret) {
           }
         }
       }
-      return this.request('patch', requestOptions.uri, requestOptions)
+      return this.request(PATCH, requestOptions.uri, requestOptions)
     },
 
     async analysisWrapper (authorisationCode, analysisId, contentFile, reportTitle, success) {
