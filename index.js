@@ -12,7 +12,6 @@ const DeveloperAPIEndpoints = require('./endpoints')
 const PATCH = 'PATCH'
 const POST = 'POST'
 const GET = 'GET'
-const DELETE = 'DELETE'
 
 module.exports = function DeveloperAPI (baseURL, clientName, clientSecret) {
   const endpoints = new DeveloperAPIEndpoints(baseURL)
